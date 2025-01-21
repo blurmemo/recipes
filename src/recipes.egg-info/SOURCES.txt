@@ -1,5 +1,0 @@
-setup.py
-src/recipes.egg-info/PKG-INFO
-src/recipes.egg-info/SOURCES.txt
-src/recipes.egg-info/dependency_links.txt
-src/recipes.egg-info/top_level.txt
