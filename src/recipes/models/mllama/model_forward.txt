@@ -1,0 +1,24 @@
+input_ids (`torch.LongTensor` of shape `(batch_size, sequence_length)`):
+pixel_values (`torch.FloatTensor` of shape `(batch_size, max_num_images, max_num_tiles, channels, image_size, image_size)):
+aspect_ratio_mask (`torch.Tensor` of shape `(batch_size, max_num_images, max_num_tiles)`, *optional*):
+    - 1 for tiles that are **not masked**,
+    - 0 for tiles that are **masked**.
+aspect_ratio_ids (`torch.Tensor` of shape `(batch_size, max_num_images)`, *optional*):
+    Aspect ratio ids used to select the appropriate precomputed tile embeddings based on the aspect ratio of each input image.
+    These ids correspond to indices in the model's list of supported aspect ratios, offset by 1.
+
+    For example, if the model supports aspect ratios [[1, 1], [1, 2], [2, 1]]:
+    - An image with aspect ratio [1, 1] would have ID 1
+    - An image with aspect ratio [1, 2] would have ID 2
+    - An image with aspect ratio [2, 1] would have ID 3
+
+    The id 0 is reserved for padding (i.e., no image).
+
+    If an image has aspect ratio [1, 2], that means it was split into 2 tiles horizontally, and its `aspect_ratio_id` would be 2.
+attention_mask (`torch.Tensor` of shape `(batch_size, sequence_length)`, *optional*):
+    - 1 for tokens that are **not masked**,
+    - 0 for tokens that are **masked**.
+labels (`torch.LongTensor` of shape `(batch_size, sequence_length)`, *optional*):
+    Labels for computing the masked language modeling loss. Indices should either be in `[0, ...,
+    config.vocab_size]` or -100 (see `input_ids` docstring). Tokens with indices set to `-100` are ignored
+    (masked), the loss is only computed for the tokens with labels in `[0, ..., config.vocab_size]`.
