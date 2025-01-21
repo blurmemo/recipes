@@ -37,9 +37,14 @@ class TrainConfig:
 
 
     # optimizer
-    optimizer = "adamw"
+    optimizer: str = "adamw"
     lr: float = 1e-4
     weight_decay: float = 0.0
+
+    # scheduler
+    scheduler: str = "steplr"
+    step_size: int = 1
+    gamma: float = 0.85
 
     # save
     output_dir: str = ""

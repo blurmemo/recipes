@@ -3,6 +3,9 @@ from transformers import AutoProcessor, AutoTokenizer
 
 class Processor:
     def __init__(self, config):
+        """
+        config: train config
+        """
         self.config = config
         self.processor = None
         self.tokenizer = None

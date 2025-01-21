@@ -5,6 +5,11 @@ from recipes.data.strategy import STRATEGY
 
 class DataLoader:
     def __init__(self, config, processor, partition="train"):
+        """
+        config: training config
+        processor: data processor
+        partition: train or val
+        """
         self.config = config
         self.processor = processor
         self.partition = partition

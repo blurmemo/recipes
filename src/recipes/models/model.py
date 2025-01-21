@@ -6,6 +6,10 @@ from recipes.models.zoo import ZOO
 
 class Model(nn.Module):
     def __init__(self, config, tokenizer):
+        """
+        config: train config
+        tokenizer: tokenizer
+        """
         super().__init__()
         self.config = config
         self.tokenizer = tokenizer

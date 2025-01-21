@@ -11,8 +11,14 @@ class OptimizerConfig:
     })
 
     @staticmethod
-    def generate(name: str = None):
-        config = OptimizerConfig()
-        names = tuple(config.optimizers.keys())
+    def generate(config):
+        """
+        config: train config
+        """
+        name = config.optimizer
+        optimizer_config = OptimizerConfig()
+        names = tuple(optimizer_config.optimizers.keys())
         assert name in names, f"optimizer: {name} is not implemented."
-        return config.optimizers[name]()
+        oc = optimizer_config.optimizers[name]()
+        oc.__dict__.update(config.__dict__)
+        return oc

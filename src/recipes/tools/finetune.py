@@ -1,10 +1,45 @@
-
-
-
+from recipes.configs.training import TrainConfig as TRAINING_CONFIG
+from recipes.utils.utils import set_seed
+from recipes.data.processor import Processor
+from recipes.models.model import Model
+from recipes.data.dataloader import DataLoader
+from recipes.optimizers.config import OptimizerConfig
+from recipes.optimizers.optimizer import Optimizer
+from recipes.schedulers.config import SchedulerConfig
+from recipes.schedulers.scheduler import Scheduler
+from recipes.trainer import Trainer
 
 def main():
-    pass
+    train_config = TRAINING_CONFIG()
 
+    set_seed(train_config.seed)
+
+    data_processor, tokenizer = Processor.build(train_config)
+
+    model = Model(train_config, tokenizer)
+
+    train_dataloader = DataLoader(train_config, data_processor, "train")
+
+    eval_dataloader = DataLoader(train_config, data_processor, "val")
+
+    optimizer_config = OptimizerConfig.generate(train_config)
+    optimizer = Optimizer.build(optimizer_config, model)
+
+    scheduler_config = SchedulerConfig.generate(train_config)
+    scheduler = Scheduler.build(scheduler_config, optimizer)
+
+    trainer = Trainer(
+        train_config,
+        model,
+        train_dataloader,
+        eval_dataloader,
+        data_processor,
+        tokenizer,
+        optimizer,
+        scheduler
+    )
+
+    trainer.train()
 
 
 

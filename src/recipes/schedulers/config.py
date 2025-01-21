@@ -9,8 +9,11 @@ class SchedulerConfig:
     })
 
     @staticmethod
-    def generate(name: str = None):
-        config = SchedulerConfig()
-        names = tuple(config.schedulers.keys())
+    def generate(config):
+        name = config.scheduler
+        scheduler_config = SchedulerConfig()
+        names = tuple(scheduler_config.schedulers.keys())
         assert name in names, f"scheduler: {name} is not implemented."
-        return config.schedulers[name]()
+        sc = scheduler_config.schedulers[name]()
+        sc.__dict__.update(config.__dict__)
+        return sc
