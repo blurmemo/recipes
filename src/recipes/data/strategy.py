@@ -45,6 +45,19 @@ STRATEGY = {
 }
 
 
+class DistributedGenericStrategy(GenericStrategy):
+    @staticmethod
+    def generate(strategy, dataset, batch_size, processor, partition="train", rank=None, world_size=None):
+        kwargs = {}
+        kwargs["batch_sampler"] = DISTRIBUTED_SAMPLER[strategy](
+            rank, dataset, batch_size,
+            num_replicas=world_size,
+            shuffle=partition == "train", drop_last=True
+        )
+        kwargs["collate_fn"] = DATA_COLLATOR[strategy](processor)
+        return kwargs
+
+
 class DistributedPaddingStrategy(PaddingStrategy):
     @staticmethod
     def generate(strategy, dataset, batch_size, processor, partition="train", rank=None, world_size=None):
