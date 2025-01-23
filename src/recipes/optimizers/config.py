@@ -1,7 +1,7 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, asdict
 
 from recipes.optimizers.adamw import AdamWConfig
-
+from recipes.utils.utils import update_attrdict
 
 
 @dataclass
@@ -20,5 +20,5 @@ class OptimizerConfig:
         names = tuple(optimizer_config.optimizers.keys())
         assert name in names, f"optimizer: {name} is not implemented."
         oc = optimizer_config.optimizers[name]()
-        oc.__dict__.update(config.__dict__)
+        update_attrdict(oc, asdict(config))
         return oc

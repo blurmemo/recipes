@@ -3,7 +3,7 @@ from torch.optim.lr_scheduler import StepLR
 
 class StepLRConfig:
     step_size: int = 1
-    gamma: float = 0.85
+    gamma: float = 0.1
 
 
 def steplr(config: StepLRConfig, optimizer):

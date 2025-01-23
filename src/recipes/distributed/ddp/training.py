@@ -4,7 +4,6 @@ from dataclasses import dataclass
 @dataclass
 class TrainConfig:
     seed: int = 42
-    device_map: str = "cuda:1"
 
     # model config
     model_name: str = "/data0/home/ening/NICA/cogmllm/models/llama/llama_vision_11B_instruct/hf"
@@ -28,6 +27,7 @@ class TrainConfig:
     stop_steps: int = 100000
     eval_interval: int = 10000
     eval_stop_steps: int = 10000
+
 
     # amp
     amp: bool = False

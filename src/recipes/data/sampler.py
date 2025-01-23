@@ -36,6 +36,25 @@ class LengthBasedBatchSampler(torch.utils.data.BatchSampler):
             return len(self.lengths) // self.batch_size + (len(self.lengths) % self.batch_size > 0)
 
 
+class DistributedLengthBasedBatchSampler(torch.utils.data.BatchSampler):
+    def __init__(self, rank: int, dataset, batch_size: int, num_replicas: int, shuffle: bool = True, drop_last: bool=True, seed: int = 0) -> None:
+        random.seed(seed)
+        self.rank = rank
+        self.batch_sampler = LengthBasedBatchSampler(dataset, batch_size=batch_size, shuffle=shuffle, drop_last=drop_last)
+        self.num_replicas = num_replicas
+
+    def __iter__(self):
+        max_length = len(self.batch_sampler) // self.num_replicas * self.num_replicas
+        return islice(self.batch_sampler, self.rank, max_length, self.num_replicas)
+
+    def __len__(self):
+        return len(self.batch_sampler) // self.num_replicas
+
+
 SAMPLER = {
     "padding": LengthBasedBatchSampler,
+}
+
+DISTRIBUTED_SAMPLER = {
+    "padding": DistributedLengthBasedBatchSampler,
 }

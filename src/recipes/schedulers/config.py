@@ -1,6 +1,7 @@
-from dataclasses import field, dataclass
+from dataclasses import field, dataclass, asdict
 
 from recipes.schedulers.steplr import StepLRConfig
+from recipes.utils.utils import update_attrdict
 
 @dataclass
 class SchedulerConfig:
@@ -15,5 +16,5 @@ class SchedulerConfig:
         names = tuple(scheduler_config.schedulers.keys())
         assert name in names, f"scheduler: {name} is not implemented."
         sc = scheduler_config.schedulers[name]()
-        sc.__dict__.update(config.__dict__)
+        update_attrdict(sc, asdict(config))
         return sc

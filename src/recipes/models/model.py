@@ -1,6 +1,7 @@
 from torch import nn
 from transformers import AutoConfig
 
+from torch.nn.parallel import DistributedDataParallel as DDP
 from recipes.models.zoo import ZOO
 
 
@@ -30,6 +31,5 @@ class Model(nn.Module):
         if len(self.tokenizer) > self.model.get_input_embeddings().weight.shape[0]:
             print("WARNING: Resize the embedding matrix to match the tokenizer vocab size.")
             self.model.resize_token_embeddings(len(self.tokenizer))
-
 
 

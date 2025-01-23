@@ -3,20 +3,27 @@ import os
 import json
 from datetime import datetime
 
+import torch
 import torch.cuda.amp
 from tqdm import tqdm
 from recipes.models.utils import to_device
 from recipes.checkpoints.config import CheckpointConfig
 from recipes.checkpoints.checkpoint import Checkpoint
 
+from recipes.distributed.utils import get_all_reduce_mean, barrier
 
 class Trainer:
     def __init__(
             self, train_config, model,
             train_dataloader, eval_dataloader,
             data_processor, tokenizer,
-            optimizer, scheduler, **kwargs
+            optimizer, scheduler,
+            local_rank=None, rank=None, world_size=None,
+            **kwargs
     ):
+        self.local_rank = local_rank
+        self.rank = rank
+        self.world_size = world_size
         self.train_config = train_config
         self.model = model
         self.train_dataloader = train_dataloader
@@ -47,6 +54,10 @@ class Trainer:
         self.eval_step_perplexity = []
         self.eval_pbar = None
 
+        # dist
+        self.reduce_loss = []
+        self.reduce_perplexity = []
+
 
     def save_checkpoint(self):
         config = CheckpointConfig(step=self.step, batch_size=self.train_config.batch_size, loss=self.loss, best_loss=self.best_loss)
@@ -63,10 +74,12 @@ class Trainer:
 
 
     def after_train(self):
-        self.save_checkpoint()
+        if self.rank == 0:
+            self.save_checkpoint()
         # save ...
-        metrics_filename = f"{self.train_config.output_dir}/train_metrics-{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.json"
+        metrics_filename = f"{self.train_config.output_dir}/train_metrics-{self.rank}-{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.json"
         save_metrics(metrics_filename, self.step, self.loss, self.perplexity, self.train_step_loss, self.train_step_perplexity)
+        barrier()
 
 
     def train(self):
@@ -78,6 +91,7 @@ class Trainer:
             loss = self.run_step(step, batch)
             self.backward(loss)
             self.after_step(loss)
+            self.reduce()
             self.pbar.update(1)
             self.pbar.set_description(f"Train Step: {self.step}/{self.max_steps} complete (loss: )")
         self.pbar.close()
@@ -93,7 +107,6 @@ class Trainer:
         self.perplexity = torch.exp(loss.detach().float())
         self.train_step_perplexity.append(float(torch.exp(loss.detach().float())))
 
-
     def run_step(self, step, batch):
         batch = to_device(batch, self.device)
         with self.autocast():
@@ -101,6 +114,13 @@ class Trainer:
         self.loss += loss.detach().float()
         loss = loss / self.train_config.gradient_accumulation_steps
         return loss
+
+    def reduce(self):
+        if self.step % len(self.train_dataloader) == 0:
+            reduce_loss = get_all_reduce_mean(self.loss) / len(self.train_dataloader)
+            self.reduce_loss.append(float(reduce_loss))
+            self.reduce_perplexity.append(float(torch.exp(reduce_loss)))
+            self.scheduler.step()
 
 
     def backward(self, loss):
