@@ -28,7 +28,7 @@ def main():
 
     data_processor, tokenizer = Processor.build(train_config)
 
-    model = Model(train_config, tokenizer)
+    model = Model(train_config, tokenizer).arch
     model.to(rank)
 
     model = DDPWrapper(model, rank)

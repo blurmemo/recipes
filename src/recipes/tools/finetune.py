@@ -7,7 +7,7 @@ from recipes.optimizers.config import OptimizerConfig
 from recipes.optimizers.optimizer import Optimizer
 from recipes.schedulers.config import SchedulerConfig
 from recipes.schedulers.scheduler import Scheduler
-from recipes.trainer import Trainer
+from recipes.tools.trainer import Trainer
 
 def main():
     train_config = TRAINING_CONFIG()
@@ -16,7 +16,7 @@ def main():
 
     data_processor, tokenizer = Processor.build(train_config)
 
-    model = Model(train_config, tokenizer)
+    model = Model(train_config, tokenizer).arch
     model.to(train_config.device_map)
 
 
