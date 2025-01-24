@@ -31,7 +31,7 @@ def main():
     model = Model(train_config, tokenizer).arch
     model.to(rank)
 
-    model = DDPWrapper(model, rank)
+    model = DDPWrapper(model, rank).arch
 
     train_dataloader = DistributedDataLoader(train_config, data_processor, train_config.train_batch_size, "train", rank=rank, world_size=world_size)
 
