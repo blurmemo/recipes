@@ -9,22 +9,22 @@ TUNER_MODEL = {
 }
 
 
-class Tuner(nn.Module):
+class Tuner:
     def __init__(self, config, model, **kwargs):
+        """
+        config: tuner config
+        """
         super().__init__()
         self.config = config
-        self.model = model
+        self.arch = model
         self._pipline()
-
-    def forward(self, *args, **kwargs):
-        return self.model(*args, **kwargs)
 
     def _pipline(self):
         self._convert()
 
     def _convert(self):
         tuner_model = TUNER_MODEL[type(self.config)]
-        self.model = tuner_model(self.config, self.model)
+        self.arch = tuner_model(self.config, self.arch)
 
 
 
