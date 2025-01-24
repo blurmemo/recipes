@@ -73,7 +73,7 @@ class Trainer:
         self.before_train()
         for step, batch in self.train_dataloader.sample():
             self.step = step
-            if self.step < self.stop_steps: break
+            if self.step == self.stop_steps: break
             self.before_step()
             loss = self.run_step(step, batch)
             self.backward(loss)
