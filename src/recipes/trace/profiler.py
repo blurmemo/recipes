@@ -4,7 +4,7 @@ import torch
 
 
 @contextlib.contextmanager
-def profiler(config):
+def profile(config):
     max_steps = config.stop_steps
     # profiler needs a warmup stage to get the accurate profiling results
     wait_step, warmup_step, active_step = 1, 2, 3
