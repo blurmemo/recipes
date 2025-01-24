@@ -50,5 +50,7 @@ class TrainConfig:
 
     # save
     output_dir: str = ""
+    profile_mode: str = None # flop or profile
+    flop_counter_start: int = 3
 
 

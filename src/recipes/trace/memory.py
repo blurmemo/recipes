@@ -5,21 +5,18 @@ import threading
 import torch
 from accelerate.utils import is_xpu_available
 
+
 def byte2gb(x):
-    return int(x / 2**30)
+    return int(x / 2 ** 30)
+
 
 # This context manager is used to track the peak memory usage of the process
 class MemoryTrace:
     def __enter__(self):
         gc.collect()
-        if is_xpu_available():
-            torch.xpu.empty_cache()
-            torch.xpu.reset_max_memory_allocated()   # reset the peak gauge to zero
-            self.begin = byte2gb(torch.xpu.memory_allocated())
-        elif torch.cuda.is_available():
-            torch.cuda.empty_cache()
-            torch.cuda.reset_max_memory_allocated()  # reset the peak gauge to zero
-            self.begin = byte2gb(torch.cuda.memory_allocated())
+        torch.cuda.empty_cache()
+        torch.cuda.reset_max_memory_allocated()  # reset the peak gauge to zero
+        self.begin = byte2gb(torch.cuda.memory_allocated())
         self.process = psutil.Process()
         self.cpu_begin = byte2gb(self.cpu_mem_used())
         self.peak_monitoring = True
@@ -77,14 +74,10 @@ class MemoryTrace:
         self.cpu_used = byte2gb(self.cpu_end - self.cpu_begin)
         self.cpu_peaked = byte2gb(self.cpu_peak - self.cpu_begin)
         # print(f"delta used/peak {self.used:4d}/{self.peaked:4d}")
-        
+
     def print_stats(self):
-        device_str = None
-        if is_xpu_available():
-            device_str = "XPU"
-        elif torch.cuda.is_available():
-            device_str = "CUDA"
-            
+        device_str = "CUDA"
+
         if device_str:
             print(f"Max {device_str} memory allocated was {self.peak} GB")
             print(f"Max {device_str} memory reserved was {self.max_reserved} GB")
