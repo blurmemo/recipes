@@ -29,5 +29,5 @@ class LoraModel:
         if check_part_module_name(name, config.target_names):
             self.layers_wrapped.append(name)
             module = recursive_getattr(self.arch, name)
-            lora_layer = LinearLoraLayer(module.weight, config.r, config.alpha, config.dropout, config.bias).to(module.weight.device)
+            lora_layer = LinearLoraLayer(module.weight, config.r, config.alpha, config.dropout, module.bias).to(module.weight.device).to(module.weight.dtype)
             recursive_setattr(self.arch, name, lora_layer)
