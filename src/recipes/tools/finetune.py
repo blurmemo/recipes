@@ -17,12 +17,12 @@ def main():
     data_processor, tokenizer = Processor.build(train_config)
 
     model = Model(train_config, tokenizer).arch
+
     model.to(train_config.device_map)
 
+    # train_dataloader = DataLoader(train_config, data_processor, tokenizer, train_config.train_batch_size, "train")
+    # eval_dataloader = DataLoader(train_config, data_processor, tokenizer, train_config.train_batch_size, "val")
 
-    # train_dataloader = DataLoader(train_config, data_processor, train_config.train_batch_size, "train")
-    #
-    # eval_dataloader = DataLoader(train_config, data_processor, train_config.val_batch_size, "val")
 
     optimizer_config = OptimizerConfig.generate(train_config)
     optimizer = Optimizer.build(optimizer_config, model)
@@ -30,17 +30,7 @@ def main():
     scheduler_config = SchedulerConfig.generate(train_config)
     scheduler = Scheduler.build(scheduler_config, optimizer)
 
-    # trainer = Trainer(
-    #     train_config,
-    #     model,
-    #     train_dataloader,
-    #     eval_dataloader,
-    #     data_processor,
-    #     tokenizer,
-    #     optimizer,
-    #     scheduler
-    # )
-    #
+    # trainer = Trainer(...)
     # trainer.train()
 
 

@@ -54,8 +54,12 @@ class LinearLoraLayer(nn.Module):
         self.fuse_lora = False
 
     def forward(self, x):
+        h = F.linear(x, self.weight, self.bias)
         if self.fuse_lora:
-            return F.linear(x, self.weight, self.bias)
+            return h
         else:
-            return F.linear(x, self.weight, self.bias) + (self.lora_dropout(x) @ self.lora_right_weight @ self.lora_left_weight) * self.lora_scaling
+            h_lora = (self.lora_dropout(x.to(
+                self.lora_right_weight.dtype)) @ self.lora_right_weight @ self.lora_left_weight) * self.lora_scaling
+            h_out = (h + h_lora).to(self.weight.dtype)
+            return h_out
 

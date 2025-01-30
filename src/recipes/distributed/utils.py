@@ -2,10 +2,15 @@ import os
 import torch
 
 import torch.distributed as dist
+import deepspeed
 
 
 def init_distributed():
     dist.init_process_group("nccl")
+
+
+def init_deepspeed():
+    deepspeed.init_distributed()
 
 
 def cleanup():

@@ -24,7 +24,7 @@ class Tuner:
 
     def _convert(self):
         tuner_model = TUNER_MODEL[type(self.config)]
-        self.arch = tuner_model(self.config, self.arch)
+        self.arch = tuner_model(self.config, self.arch).arch
 
 
 

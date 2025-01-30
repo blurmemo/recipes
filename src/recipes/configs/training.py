@@ -21,13 +21,13 @@ class TrainConfig:
     train_batch_size: int = 1
     val_batch_size: int = 1
     batch_strategy: str = "meta"  # eq=dataset or padding or packing
-    num_workers: int = 1
+    num_workers: int = 4
 
     # epoch
     epoch: int = 1
-    stop_steps: int = 100000
-    eval_interval: int = 10000
-    eval_stop_steps: int = 10000
+    stop_steps: int = 240100
+    eval_interval: int = 9604
+    eval_stop_steps: int = 2401
 
     # amp
     amp: bool = False

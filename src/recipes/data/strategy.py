@@ -5,17 +5,17 @@ from transformers import default_data_collator
 
 class GenericStrategy:
     @staticmethod
-    def generate(strategy, dataset, batch_size, processor, partition="train"):
+    def generate(strategy, dataset, batch_size, processor, tokenizer, partition="train"):
         kwargs = {}
         kwargs["batch_sampler"] = SAMPLER[strategy](
             dataset, batch_size, shuffle=partition == "train", drop_last=True
         )
-        kwargs["collate_fn"] = DATA_COLLATOR[strategy](dataset, processor)
+        kwargs["collate_fn"] = DATA_COLLATOR[strategy](dataset, processor, tokenizer)
         return kwargs
 
 class PaddingStrategy:
     @staticmethod
-    def generate(strategy, dataset, batch_size, processor, partition="train"):
+    def generate(strategy, dataset, batch_size, processor, tokenizer, partition="train"):
         kwargs = {}
         kwargs["batch_sampler"] = SAMPLER["padding"](
             dataset, batch_size, shuffle=partition == "train", drop_last=True
@@ -25,7 +25,7 @@ class PaddingStrategy:
 
 class PackingStrategy:
     @staticmethod
-    def generate(strategy, dataset, batch_size, processor, partition="train"):
+    def generate(strategy, dataset, batch_size, processor, tokenizer, partition="train"):
         kwargs = {}
         kwargs["batch_size"] = batch_size
         kwargs["drop_last"] = True if partition == "train" else False
@@ -47,20 +47,20 @@ STRATEGY = {
 
 class DistributedGenericStrategy(GenericStrategy):
     @staticmethod
-    def generate(strategy, dataset, batch_size, processor, partition="train", rank=None, world_size=None):
+    def generate(strategy, dataset, batch_size, processor, tokenizer, partition="train", rank=None, world_size=None):
         kwargs = {}
         kwargs["batch_sampler"] = DISTRIBUTED_SAMPLER[strategy](
             rank, dataset, batch_size,
             num_replicas=world_size,
             shuffle=partition == "train", drop_last=True
         )
-        kwargs["collate_fn"] = DATA_COLLATOR[strategy](processor)
+        kwargs["collate_fn"] = DATA_COLLATOR[strategy](dataset, processor, tokenizer)
         return kwargs
 
 
 class DistributedPaddingStrategy(PaddingStrategy):
     @staticmethod
-    def generate(strategy, dataset, batch_size, processor, partition="train", rank=None, world_size=None):
+    def generate(strategy, dataset, batch_size, processor, tokenizer, partition="train", rank=None, world_size=None):
         kwargs = {}
         kwargs["batch_sampler"] = DISTRIBUTED_SAMPLER["padding"](
             rank, dataset, batch_size,

@@ -23,11 +23,11 @@ class LoraModel:
     def _wrap(self):
         for name, module in self.arch.named_modules():
             if isinstance(module, nn.Linear):
-                self._wrap_linear_layer(name, self.config.layers[nn.Linear])
+                self._wrap_linear_layer(name, self.config.linear)
 
     def _wrap_linear_layer(self, name, config):
         if check_part_module_name(name, config.target_names):
             self.layers_wrapped.append(name)
             module = recursive_getattr(self.arch, name)
-            lora_layer = LinearLoraLayer(module.weight, config.r, config.alpha, config.dropout, module.bias).to(module.weight.device).to(module.weight.dtype)
+            lora_layer = LinearLoraLayer(module.weight, config.r, config.alpha, config.dropout, module.bias).to(module.weight.device)
             recursive_setattr(self.arch, name, lora_layer)

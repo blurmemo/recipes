@@ -17,6 +17,4 @@ class LinearConfig(TunerConfig):
 
 @dataclass
 class LoraConfig:
-     layers: dict[nn.Module, TunerConfig] = field(default_factory=lambda: {
-          nn.Linear: LinearConfig(),
-     })
+     linear: LinearConfig = LinearConfig()
